@@ -1,4 +1,4 @@
 package com.techvista.vistajuris.app.service.impl;
 
-public class ClienteServiceImpl {
+public class ClienteServiceImpl{
 }

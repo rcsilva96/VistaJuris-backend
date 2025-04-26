@@ -3,60 +3,72 @@ package com.techvista.vistajuris.infra.repository.impl;
 import com.techvista.vistajuris.domain.model.ClienteModel;
 import com.techvista.vistajuris.domain.repository.ClienteRepository;
 import com.techvista.vistajuris.infra.entity.ClienteEntity;
+import com.techvista.vistajuris.infra.repository.ClienteJpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class ClienteRepositoryImpl implements ClienteRepository {
-    
-    private final ClienteRepository clienteRepository;
-    
-    public ClienteRepositoryImpl(ClienteRepository clienteRepository) {
-        this.clienteRepository = clienteRepository;
+
+    private final ClienteJpaRepository clienteJpaRepository;
+
+    public ClienteRepositoryImpl(ClienteJpaRepository clienteJpaRepository) {
+        this.clienteJpaRepository = clienteJpaRepository;
     }
-    
+
     @Override
-    public ClienteModel salvar(ClienteModel cliente){
-        
-        clienteEntity entity = toEntity(cliente);
-        return toDomain(clienteRepository.save(entity));
-        
+    public ClienteModel salvar(ClienteModel cliente) {
+        ClienteEntity entity = toEntity(cliente);
+        return toDomain(clienteJpaRepository.save(entity));
     }
 
     @Override
     public Optional<ClienteModel> buscarPorId(Long id) {
-
-        return clienteRepository.findAll().stream().map(this::toDomain).collect(collectors.toList());
-
+        return clienteJpaRepository.findById(id)
+                .map(this::toDomain);
     }
 
     @Override
-    public void deletar(Long id) {
+    public List<ClienteModel> listarTodos() {
+        return clienteJpaRepository.findAll()
+                .stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
 
-        clienteRepository.deleteById(id);
+    @Override
+    public void deletar(Long id){
+        clienteJpaRepository.deleteById(id);
+    }
+
+    private ClienteModel toDomain(ClienteEntity entity) {
+
+        if (entity == null) return null;
+        return new ClienteModel(
+                entity.getId(),
+                entity.getNome(),
+                entity.getCpf(),
+                entity.getEmail(),
+                entity.getTelefone(),
+                entity.getDataCadastro()
+        );
 
     }
 
-    // Conversores
-    private Cliente toDomain(ClienteEntity entity) {
-        Cliente cliente = new Cliente();
-        cliente.setId(entity.getId());
-        cliente.setNome(entity.getNome());
-        cliente.setEmail(entity.getEmail());
-        cliente.setTelefone(entity.getTelefone());
-        cliente.setDataCadastro(entity.getDataCadastro());
-        return cliente;
+    private ClienteEntity toEntity(ClienteModel model) {
+
+        if (model == null) return null;
+        return new ClienteEntity(
+                model.getId(),
+                model.getNome(),
+                model.getCpf(),
+                model.getEmail(),
+                model.getTelefone(),
+                model.getDataCadastro()
+        );
     }
 
-    private ClienteEntity toEntity(Cliente cliente) {
-        ClienteEntity entity = new ClienteEntity();
-        entity.setId(cliente.getId());
-        entity.setNome(cliente.getNome());
-        entity.setEmail(cliente.getEmail());
-        entity.setTelefone(cliente.getTelefone());
-        entity.setDataCadastro(cliente.getDataCadastro());
-        return entity;
-    }
-    
 }

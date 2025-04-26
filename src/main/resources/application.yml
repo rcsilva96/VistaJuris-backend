@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: vista-juris
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vistajuris
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+server:
+  port: 8080
